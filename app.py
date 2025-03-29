@@ -37,4 +37,4 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="嗨～我可以幫你擲骰占卜，輸入「擲骰」或「占卜」就可以囉！"))
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=10000)
