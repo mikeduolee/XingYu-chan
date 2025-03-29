@@ -1,23 +1,28 @@
-from apscheduler.schedulers.blocking import BlockingScheduler
+from utils import get_reading, load_all_users
 from linebot import LineBotApi
-from linebot.models import TextSendMessage
-from utils import get_random_reading, load_all_users
-import os
 from dotenv import load_dotenv
+import os
+import time
 
 load_dotenv()
 line_bot_api = LineBotApi(os.getenv("CHANNEL_ACCESS_TOKEN"))
-sched = BlockingScheduler()
 
-@sched.scheduled_job('cron', hour=8, minute=0)
-def morning_push():
+def push_daily_message():
     users = load_all_users()
-    msg = get_random_reading()
+    message = get_reading()
     for user_id in users:
         try:
-            line_bot_api.push_message(user_id, TextSendMessage(text=msg))
+            line_bot_api.push_message(user_id, TextSendMessage(text=message))
         except Exception as e:
-            print(f"Error sending to {user_id}: {e}")
+            print(f"❌ 推播失敗: {user_id} - {str(e)}")
 
 if __name__ == "__main__":
-    sched.start()
+    while True:
+        current_time = time.strftime("%H:%M")
+        if current_time == "08:00":
+            from linebot.models import TextSendMessage
+            print("🌞 發送每日星語中...")
+            push_daily_message()
+            time.sleep(60)  # 避免重複發送
+        else:
+            time.sleep(30)

@@ -2,7 +2,7 @@ from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
-from utils import get_interactive_reading, add_user_if_new
+from utils import get_reading, add_user_if_new
 from dotenv import load_dotenv
 import os
 
@@ -30,10 +30,13 @@ def handle_message(event):
     add_user_if_new(user_id)
     msg = event.message.text.strip()
     if "擲骰" in msg or "占卜" in msg or "幫我" in msg:
-        result = get_interactive_reading()
+        result = get_reading()
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=result))
     else:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="嗨～我是星語姬🌟 輸入「擲骰」或「幫我占卜」，我就會把星星的訊息告訴你～"))
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="嗨～我是星語姬🌟 想聽聽星星的悄悄話嗎？輸入「擲骰」或「幫我占卜」吧～")
+        )
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
